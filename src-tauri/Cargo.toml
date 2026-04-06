@@ -1,0 +1,29 @@
+[package]
+name = "zelix-agents"
+version = "0.1.0"
+description = "Multi-Agent Orchestrator for OpenCode"
+authors = ["Sayan"]
+license = "MIT"
+repository = ""
+edition = "2021"
+rust-version = "1.77.2"
+
+[lib]
+name = "app_lib"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[build-dependencies]
+tauri-build = { version = "2.5.6", features = [] }
+
+[dependencies]
+serde_json = "1.0"
+serde = { version = "1.0", features = ["derive"] }
+log = "0.4"
+tauri = { version = "2.10.3", features = ["tray-icon"] }
+tauri-plugin-log = "2"
+tauri-plugin-shell = "2"
+portable-pty = "0.9"
+tokio = { version = "1", features = ["full"] }
+uuid = { version = "1", features = ["v4"] }
+parking_lot = "0.12"
+sysinfo = "0.33"
