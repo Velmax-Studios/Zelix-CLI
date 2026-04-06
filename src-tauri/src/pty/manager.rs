@@ -242,7 +242,7 @@ impl PtyManager {
         
         let mut sys = self.sys.lock();
         // Refresh only the process list without hardware details
-        sys.refresh_processes(sysinfo::ProcessesToUpdate::All);
+        sys.refresh_processes(sysinfo::ProcessesToUpdate::All, false);
 
         // A terminal is "active" if its shell has any child processes
         let target_pid = Pid::from(shell_pid as usize);
