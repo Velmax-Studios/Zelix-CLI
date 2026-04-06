@@ -6,6 +6,7 @@ import { ptySpawn, ptyKill, ptyHasActiveProcess } from '../../lib/ipc';
 export const TilingContainer: React.FC = () => {
   const { tabs, activeTabId, addTab, removeTab, setActiveTab } = useTerminalStore();
   const [pendingClose, setPendingClose] = React.useState<{ tabId: string; ptyId: string } | null>(null);
+  const [closingTabIds, setClosingTabIds] = React.useState<Set<string>>(new Set());
 
   const spawnTerminal = useCallback(async () => {
     try {
@@ -39,7 +40,20 @@ export const TilingContainer: React.FC = () => {
     } catch {
       // Ignore if already dead
     }
-    removeTab(tabId);
+
+    // Start exit animation
+    setClosingTabIds(prev => new Set(prev).add(tabId));
+    
+    // Wait for the animation (0.2s duration from index.css)
+    setTimeout(() => {
+      removeTab(tabId);
+      setClosingTabIds(prev => {
+        const next = new Set(prev);
+        next.delete(tabId);
+        return next;
+      });
+    }, 200);
+
     setPendingClose(null);
   }, [removeTab]);
 
@@ -124,7 +138,7 @@ export const TilingContainer: React.FC = () => {
         return (
           <div 
             key={tab.id}
-            className={`tile ${activeTabId === tab.id ? 'active' : ''}`}
+            className={`tile ${activeTabId === tab.id ? 'active' : ''} ${closingTabIds.has(tab.id) ? 'tile-closing' : ''}`}
             data-index={idx + 1}
             style={tileStyle}
             onClick={() => setActiveTab(tab.id)}
