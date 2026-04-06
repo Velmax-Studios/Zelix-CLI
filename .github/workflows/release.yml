@@ -47,7 +47,7 @@ jobs:
         run: |
           npm run tauri build
           cd src-tauri/target/release
-          tar -czf bundle/zelix-agents-linux-x64.tar.gz zelix-agents
+          tar -czf bundle/zelix-cli-linux-x64.tar.gz zelix-cli
 
       - uses: tauri-apps/tauri-action@v0
         env:
