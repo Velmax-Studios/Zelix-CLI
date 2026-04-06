@@ -1,8 +1,9 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
-  "productName": "Zelix Agents",
+  "productName": "Zelix CLI",
+
   "version": "0.1.0",
-  "identifier": "com.zelix.agents",
+  "identifier": "com.zelix.cli",
   "build": {
     "frontendDist": "../dist",
     "devUrl": "http://localhost:5173",
@@ -12,7 +13,7 @@
   "app": {
     "windows": [
       {
-        "title": "Zelix Agents",
+        "title": "Zelix CLI",
         "width": 1440,
         "height": 900,
         "minWidth": 1024,

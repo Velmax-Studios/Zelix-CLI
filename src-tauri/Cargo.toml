@@ -1,5 +1,5 @@
 [package]
-name = "zelix-agents"
+name = "zelix-cli"
 version = "0.1.0"
 description = "Multi-Agent Orchestrator for OpenCode"
 authors = ["Sayan"]

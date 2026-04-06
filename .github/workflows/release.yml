@@ -47,16 +47,16 @@ jobs:
         run: |
           npm run tauri build
           cd src-tauri/target/release
-          tar -czf ../../bundle/appimage/zelix-agents-linux-x64.tar.gz zelix-agents
+          tar -czf bundle/zelix-agents-linux-x64.tar.gz zelix-agents
 
       - uses: tauri-apps/tauri-action@v0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           tagName: v__VERSION__ # tauri-action replaces this with the app version.
-          releaseName: "Zelix Agents v__VERSION__"
-          releaseBody: "Release of Zelix Agents v__VERSION__"
-          releaseDraft: true
+          releaseName: "Zelix CLI v__VERSION__"
+          releaseBody: "Release of Zelix CLI v__VERSION__"
+          releaseDraft: false
           prerelease: false
           args: ${{ matrix.args }}
 
