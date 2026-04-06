@@ -92,24 +92,37 @@ export const TerminalPane: React.FC<TerminalPaneProps> = React.memo(({ ptyId, is
     // Listen for PTY output
     let unlistenData: (() => void) | null = null;
     let unlistenExit: (() => void) | null = null;
+    let isMounted = true;
 
-    onPtyData(ptyId, (data) => {
-      terminal.write(data);
-    }).then((fn) => {
-      unlistenData = fn;
-    });
+    const setupListeners = async () => {
+      const dataFn = await onPtyData(ptyId, (data) => {
+        if (isMounted) terminal.write(data);
+      });
+      if (isMounted) {
+        unlistenData = dataFn;
+      } else {
+        dataFn();
+      }
 
-    onPtyExit(ptyId, () => {
-      terminal.write('\r\n\x1b[90m[Process exited]\x1b[0m\r\n');
-      onExitRef.current?.();
-    }).then((fn) => {
-      unlistenExit = fn;
-    });
+      const exitFn = await onPtyExit(ptyId, () => {
+        if (isMounted) {
+          terminal.write('\r\n\x1b[90m[Process exited]\x1b[0m\r\n');
+          onExitRef.current?.();
+        }
+      });
+      if (isMounted) {
+        unlistenExit = exitFn;
+      } else {
+        exitFn();
+      }
+    };
+
+    setupListeners();
 
     // Resize observer with frame sync to prevent stretching
     const resizeObserver = new ResizeObserver(() => {
       requestAnimationFrame(() => {
-        if (!terminalRef.current) return;
+        if (!terminalRef.current || !isMounted) return;
         try {
           fitAddon.fit();
           if (terminal.cols > 0 && terminal.rows > 0) {
@@ -124,9 +137,10 @@ export const TerminalPane: React.FC<TerminalPaneProps> = React.memo(({ ptyId, is
     resizeObserver.observe(containerRef.current);
 
     return () => {
+      isMounted = false;
       resizeObserver.disconnect();
-      unlistenData?.();
-      unlistenExit?.();
+      if (unlistenData) unlistenData();
+      if (unlistenExit) unlistenExit();
       terminal.dispose();
     };
   }, [ptyId]); // Removed onExit from deps to prevent re-init

@@ -27,12 +27,14 @@ struct PtyInstance {
 
 pub struct PtyManager {
     instances: Arc<Mutex<HashMap<String, PtyInstance>>>,
+    sys: Arc<Mutex<System>>,
 }
 
 impl PtyManager {
     pub fn new() -> Self {
         Self {
             instances: Arc::new(Mutex::new(HashMap::new())),
+            sys: Arc::new(Mutex::new(System::new())),
         }
     }
 
@@ -229,11 +231,18 @@ impl PtyManager {
             return false;
         };
 
+        if !instance.info.is_alive {
+            return false;
+        }
+
         let shell_pid = instance.shell_pid;
+        if shell_pid == 0 {
+            return false;
+        }
         
-        // Refresh only what we need to minimize overhead
-        let mut sys = System::new_all();
-        sys.refresh_all();
+        let mut sys = self.sys.lock();
+        // Refresh only the process list without hardware details
+        sys.refresh_processes(sysinfo::ProcessesToUpdate::All);
 
         // A terminal is "active" if its shell has any child processes
         let target_pid = Pid::from(shell_pid as usize);
