@@ -1,24 +1,32 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');
 
 :root {
-  /* MONOCHROME PALETTE */
-  --bg-base: #0a0a0a; /* Pure deep black */
-  --bg-surface: #141414; /* Charcoal surface */
-  --text-primary: #f5f5f5; /* Off-white */
-  --text-secondary: #888888; /* Mid gray */
-  --accent-active: #ffffff; /* Sharp white */
-  --accent-inactive: #2a2a2a; /* Dark border */
+  /* LIQUID MONOCHROME PALETTE */
+  --bg-base: #000000; /* Absolute deep black */
+  --bg-liquid: rgba(18, 18, 18, 0.7); /* Refractive glass base */
+  --text-primary: #f5f5f5;
+  --text-secondary: #777777;
+  --accent-active: #ffffff;
+  --accent-inactive: rgba(255, 255, 255, 0.08);
+  
+  /* LIQUID GLASS PROPERTIES */
+  --glass-blur: 32px;
+  --glass-saturate: 180%;
+  --glass-border: 1px solid rgba(255, 255, 255, 0.1);
+  --glass-highlight: 1px solid rgba(255, 255, 255, 0.15); /* Specular top edge */
   
   /* DEPTH & LAYOUT */
-  --gap-size: 12px;
-  --border-radius: 6px;
-  --border-width: 1px;
-  --depth-shadow: 0 10px 40px rgba(0, 0, 0, 0.85);
-  --active-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
+  --gap-size: 8px;
+  --border-radius: 4px; /* Sharper, cleaner corners */
+  --depth-shadow: 0 50px 100px rgba(0, 0, 0, 0.9);
   
   /* FONTS */
   --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
   --font-sans: 'Inter', system-ui, sans-serif;
+
+  /* LIQUID MOTION */
+  --liquid-ease: cubic-bezier(0.05, 0.9, 0.1, 1);
+  --liquid-duration: 0.4s;
 }
 
 body {
@@ -44,27 +52,38 @@ body {
   justify-content: space-between;
   align-items: center;
   padding: 0 16px;
-  background-color: rgba(10, 10, 10, 0.9);
-  backdrop-filter: blur(12px);
+  background-color: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
   font-family: var(--font-mono);
   font-size: 11px;
   letter-spacing: 0.05em;
-  border-bottom: 1px solid var(--accent-inactive);
+  border-bottom: var(--glass-border);
   z-index: 50;
   height: 32px;
   text-transform: uppercase;
 }
 
-/* TILING CONTAINER */
+/* TILING CONTAINER (THE VORTEX) */
 .tiling-container {
   display: grid;
   flex: 1;
-  background: var(--bg-dark);
+  background: radial-gradient(circle at 50% 50%, #151515 0%, #000000 100%);
   position: relative;
-  overflow: hidden; /* Lock content to screen */
-  padding: 4px;
-  gap: 4px;
+  overflow: hidden;
+  padding: 8px;
+  gap: 8px;
   box-sizing: border-box;
+}
+
+/* SUBTLE NOISE OVERLAY FOR DEPTH */
+.tiling-container::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+  opacity: 0.015;
+  pointer-events: none;
+  z-index: 0;
 }
 
 /* TILE STYLING WITH DEPTH */
@@ -81,38 +100,57 @@ body {
   animation: tile-spawn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 @keyframes tile-spawn {
-  from { opacity: 0; transform: scale(0.96) translateY(10px); filter: blur(4px); }
+  from { opacity: 0; transform: scale(0.92) translateY(30px); filter: blur(10px); }
   to { opacity: 1; transform: scale(1) translateY(0); filter: blur(0); }
 }
 
-/* TILE BASE */
+@keyframes tile-exit {
+  from { opacity: 1; transform: scale(1) translateY(0); filter: blur(0); }
+  to { opacity: 0; transform: scale(0.92) translateY(30px); filter: blur(10px); }
+}
+
+/* LIQUID GLASS TILE */
 .tile {
   position: relative;
-  background: var(--bg-surface);
-  border: 1px solid var(--accent-inactive);
+  background: var(--bg-liquid);
+  backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+  border: var(--glass-border);
+  border-top: var(--glass-highlight); /* Liquid specular edge */
   display: flex;
   flex-direction: column;
   overflow: hidden;
   width: 100%;
   height: 100%;
-  min-width: 0; /* The "Flexbox/Grid Fix" to prevent content overflow */
+  min-width: 0;
   min-height: 0;
   box-sizing: border-box;
   transition: 
-    grid-column 0.4s cubic-bezier(0.16, 1, 0.3, 1),
-    grid-row 0.4s cubic-bezier(0.16, 1, 0.3, 1),
-    order 0.4s cubic-bezier(0.16, 1, 0.3, 1),
-    transform 0.3s cubic-bezier(0.16, 1, 0.3, 1),
+    order var(--liquid-duration) var(--liquid-ease),
+    transform var(--liquid-duration) var(--liquid-ease),
     border-color 0.2s ease,
-    box-shadow 0.2s ease,
-    opacity 0.2s ease;
-  animation: tile-spawn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    filter var(--liquid-duration) var(--liquid-ease),
+    opacity var(--liquid-duration) var(--liquid-ease),
+    box-shadow var(--liquid-duration) var(--liquid-ease);
+  animation: tile-spawn var(--liquid-duration) var(--liquid-ease);
   z-index: 1;
 }
 
+.tile-closing {
+  animation: tile-exit var(--liquid-duration) var(--liquid-ease) forwards;
+  pointer-events: none;
+}
+
 .tile.active {
-  border-color: var(--accent-active);
-  box-shadow: 0 0 20px rgba(255, 255, 255, 0.05);
+  border: 1.5px solid var(--accent-active);
+  z-index: 10;
+  transform: scale(1.005); /* Very subtle pop */
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+  filter: brightness(1.1);
+}
+
+.tile:not(.active):not(.dragging):not(.floating) {
+  filter: brightness(0.65) desaturate(0.3);
+  opacity: 0.85;
 }
 
 /* FLOATING MODE */
@@ -134,6 +172,8 @@ body {
   border: 1.5px solid var(--accent-active) !important;
   cursor: grabbing !important;
   border-radius: 8px; /* Slight roundness when popped */
+  transition: transform 0.08s var(--liquid-ease), box-shadow 0.2s ease !important;
+  z-index: 9999 !important;
 }
 
 .tiling-container:has(.dragging) {

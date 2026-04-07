@@ -33,7 +33,7 @@ export const TerminalPane: React.FC<TerminalPaneProps> = React.memo(({ ptyId, is
       cursorStyle: 'bar',
       scrollback: 10000,
       theme: {
-        background: '#141414',
+        background: 'transparent', // Allow Liquid Glass surface to show through
         foreground: '#f5f5f5',
         cursor: '#ffffff',
         selectionBackground: 'rgba(255, 255, 255, 0.2)',
