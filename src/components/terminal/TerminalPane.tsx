@@ -72,7 +72,10 @@ export const TerminalPane: React.FC<TerminalPaneProps> = React.memo(({ ptyId, is
     // Allow global hotkeys (like Alt+Enter) to bubble up
     terminal.attachCustomKeyEventHandler((e) => {
       // Let global shortcuts pass through to the browser/window
-      if ((e.altKey || e.metaKey) && (e.key === 'Enter' || e.key.toLowerCase() === 'q')) {
+      if ((e.altKey || e.metaKey) && (e.key === 'Enter' || e.key.toLowerCase() === 'q' || e.key.toLowerCase() === 'f')) {
+        return false;
+      }
+      if (e.key === 'Escape') {
         return false;
       }
       return true;

@@ -11,6 +11,7 @@ export interface TerminalTab {
   id: string;
   ptyId: string;
   title: string;
+  isFloating?: boolean;
 }
 
 // ========== PROJECT/SETTINGS ==========
